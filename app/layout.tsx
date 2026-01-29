@@ -18,7 +18,19 @@ const blackHanSans = Black_Han_Sans({
 
 export const metadata: Metadata = {
   title: "조선의 욕쟁이 할머니 사주",
-  description: "너, 인생 답답해서 왔냐? 대충 살 거면 나가!",
+  description: "니 인생이 왜 꼬였는지 궁금하냐? 내가 아주 뼈 때리게 풀어주마!",
+  openGraph: {
+    title: "조선의 욕쟁이 할머니 사주",
+    description: "니 인생이 왜 꼬였는지 궁금하냐? 내가 아주 뼈 때리게 풀어주마!",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "욕쟁이 할머니 사주" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "조선의 욕쟁이 할머니 사주",
+    description: "니 인생이 왜 꼬였는지 궁금하냐? 내가 아주 뼈 때리게 풀어주마!",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
