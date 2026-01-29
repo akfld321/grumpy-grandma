@@ -17,19 +17,20 @@ const blackHanSans = Black_Han_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://grandma-saju.com"),
   title: "조선의 욕쟁이 할머니 사주",
   description: "니 인생이 왜 꼬였는지 궁금하냐? 내가 아주 뼈 때리게 풀어주마!",
   openGraph: {
     title: "조선의 욕쟁이 할머니 사주",
     description: "니 인생이 왜 꼬였는지 궁금하냐? 내가 아주 뼈 때리게 풀어주마!",
-    images: [{ url: "/og-image-v3.png", width: 1200, height: 630, alt: "욕쟁이 할머니 사주" }],
+    images: [{ url: "/og-image-v3.png?v=final", width: 1200, height: 630, alt: "욕쟁이 할머니 사주" }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "조선의 욕쟁이 할머니 사주",
     description: "니 인생이 왜 꼬였는지 궁금하냐? 내가 아주 뼈 때리게 풀어주마!",
-    images: ["/og-image-v3.png"],
+    images: ["/og-image-v3.png?v=final"],
   },
 };
 
