@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Gowun_Batang, Black_Han_Sans } from "next/font/google";
 import "./globals.css";
+import { GoogleTagManager } from '@next/third-parties/google';
+import LayoutWrapper from "@/components/LayoutWrapper";
 
 const gowunBatang = Gowun_Batang({
   weight: ["400", "700"],
@@ -19,9 +21,6 @@ export const metadata: Metadata = {
   description: "너, 인생 답답해서 왔냐? 대충 살 거면 나가!",
 };
 
-import { GoogleTagManager } from '@next/third-parties/google';
-import { SpeedInsights } from "@vercel/speed-insights/next";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,11 +32,7 @@ export default function RootLayout({
       <body
         className={`${gowunBatang.variable} ${blackHanSans.variable} antialiased font-serif bg-stone-950 text-ink`}
       >
-        <div className="max-w-[600px] mx-auto min-h-screen bg-paper shadow-2xl relative flex flex-col">
-
-          {children}
-          <SpeedInsights />
-        </div>
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   );
