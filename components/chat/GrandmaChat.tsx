@@ -8,7 +8,7 @@ import { calculateSaju, SajuResult } from "@/lib/saju";
 import { convertSajuToPaidResult } from "@/lib/saju/transform";
 import { PaidSajuResult } from "@/types/PaidResultTypes";
 import { useChatReducer, Stage, UserData } from "./useChatReducer";
-import { sendGTMEvent } from "@/lib/gtm";
+import { sendGTMEvent } from "@/lib/analytics";
 
 const TIME_OPTIONS = [
     { label: "시간모름", value: "UNKNOWN" },

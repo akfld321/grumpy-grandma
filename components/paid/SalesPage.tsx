@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Lock, Sparkles, Heart, DollarSign, ArrowRight, ShieldCheck, Star, Users, TrendingUp, Activity, Calendar, Award, MessageCircle } from 'lucide-react';
 import { loadPaymentWidget, PaymentWidgetInstance } from '@tosspayments/payment-widget-sdk';
-import { sendGTMEvent } from '@/lib/gtm';
+import { sendGTMEvent, ANALYTICS_EVENTS } from '@/lib/analytics';
 
 interface SalesPageProps {
     onPaymentStart: () => Promise<string | null>;
@@ -22,7 +22,7 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
         }, 1000);
 
         // Analytics: View Sales Page
-        sendGTMEvent('sales_page_view');
+        sendGTMEvent(ANALYTICS_EVENTS.VIEW_SALES_PAGE);
 
         return () => clearInterval(timer);
     }, []);
@@ -111,7 +111,7 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
             }
 
             // Analytics: Begin Checkout
-            sendGTMEvent('initiate_checkout', {
+            sendGTMEvent(ANALYTICS_EVENTS.BEGIN_CHECKOUT, {
                 currency: 'KRW',
                 value: price,
                 items: [{

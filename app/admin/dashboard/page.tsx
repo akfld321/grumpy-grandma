@@ -201,14 +201,26 @@ export default function AdminDashboard() {
                             { id: 'today', label: '오늘' },
                             { id: 'week', label: '7일' },
                             { id: 'month', label: '30일' },
-                            { id: 'all', label: '전체' }
+                            { id: 'all', label: '전체' },
+                            { id: 'custom', label: '📅 직접 선택' }
                         ].map(p => (
                             <button key={p.id} onClick={() => setDatePreset(p.id)}
-                                className={`px-3 py-1.5 text-xs font-bold rounded-md transition ${datePreset === p.id ? 'bg-stone-700 text-white' : 'text-stone-500 hover:text-stone-300'}`}>
+                                className={`px-3 py-1.5 text-xs font-bold rounded-md transition ${datePreset === p.id ? 'bg-white text-black shadow-md' : 'text-stone-400 hover:text-white'}`}>
                                 {p.label}
                             </button>
                         ))}
                     </div>
+
+                    {/* Custom Date Picker (Visible only when 'custom' is selected) */}
+                    {datePreset === 'custom' && (
+                        <div className="flex items-center gap-2 animate-fadeIn bg-stone-900/80 p-1 rounded-lg border border-stone-700">
+                            <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)}
+                                className="bg-transparent text-white text-xs p-1 outline-none font-mono [color-scheme:dark]" />
+                            <span className="text-stone-500 text-xs">~</span>
+                            <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)}
+                                className="bg-transparent text-white text-xs p-1 outline-none font-mono [color-scheme:dark]" />
+                        </div>
+                    )}
 
                     <button onClick={() => { sessionStorage.removeItem('admin_key'); setIsLoggedIn(false); }}
                         className="text-xs text-red-400 hover:text-red-300 font-bold px-3 py-1.5 border border-red-900/30 rounded bg-red-900/10">

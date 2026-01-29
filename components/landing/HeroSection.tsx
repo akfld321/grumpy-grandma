@@ -2,14 +2,15 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { GRANDMA_PERSONA } from "@/lib/persona";
 import { useEffect } from "react";
-import { sendGTMEvent } from "@/lib/gtm";
+import { sendGTMEvent, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 export default function HeroSection({ onStart }: { onStart: () => void }) {
-    useEffect(() => {
-        sendGTMEvent('landing_view');
-    }, []);
+
+    const handleStart = () => {
+        sendGTMEvent(ANALYTICS_EVENTS.BEGIN_CHAT);
+        onStart();
+    };
 
     return (
         <section className="relative h-screen w-full overflow-hidden flex flex-col items-center justify-end text-center bg-black">
@@ -81,7 +82,7 @@ export default function HeroSection({ onStart }: { onStart: () => void }) {
                 <motion.button
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={onStart}
+                    onClick={handleStart}
                     className="relative group cursor-pointer"
                 >
                     <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl border-4 border-red-900 bg-[#9c2727] shadow-[0_0_20px_rgba(150,30,30,0.6)] flex flex-col items-center justify-center rotate-45 group-hover:bg-[#7f1d1d] transition-colors">

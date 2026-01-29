@@ -3,7 +3,7 @@
 
 import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { sendGTMEvent } from "@/lib/gtm";
+import { sendGTMEvent, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 function PaymentSuccessContent() {
     const router = useRouter();
@@ -36,7 +36,7 @@ function PaymentSuccessContent() {
                 }
 
                 // Analytics: Purchase (Wait for confirm to prevent duplicates on client if possible, but simpler here)
-                sendGTMEvent('purchase', {
+                sendGTMEvent(ANALYTICS_EVENTS.PURCHASE, {
                     transaction_id: orderId,
                     value: Number(amount),
                     currency: 'KRW',
