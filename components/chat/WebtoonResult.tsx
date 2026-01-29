@@ -176,7 +176,7 @@ const BarChartSection = ({ data }: { data: { id: string, label: string, val: num
     );
 };
 
-import { sendGTMEvent } from "@/lib/gtm";
+import { sendGTMEvent } from "@/lib/analytics";
 
 export default function WebtoonResult({ result, onReset }: WebtoonResultProps) {
     useEffect(() => {
