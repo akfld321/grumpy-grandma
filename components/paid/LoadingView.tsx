@@ -63,6 +63,12 @@ const LoadingView: React.FC = () => {
                 {message}
                 <br />
                 <span className="text-xs text-stone-600 mt-1 block">({Math.floor(progress)}%)</span>
+                {progress >= 99 && (
+                    <span className="text-xs text-amber-600 mt-2 block animate-pulse font-bold">
+                        분석할 내용이 많아 시간이 조금 걸립니다...<br />
+                        새로고침 하지 말고 잠시만 기다려주세요!
+                    </span>
+                )}
             </p>
         </div>
     );

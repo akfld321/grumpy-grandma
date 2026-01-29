@@ -465,12 +465,12 @@ export default function WebtoonResult({ result, onReset }: WebtoonResultProps) {
 
             {/* 6. COMPARISON TABLE */}
             <section className="bg-white py-12 px-6 border-b-4 border-black">
-                <h3 className="text-center font-black text-xl mb-8">왜 '평생 비책'인가?</h3>
+                <h3 className="text-center font-black text-xl mb-8">왜 '단독 비책'인가?</h3>
                 <div className="border-2 border-stone-900 rounded-lg overflow-hidden">
                     <div className="grid grid-cols-3 bg-stone-100 font-bold border-b-2 border-stone-900 text-center text-xs py-3">
                         <div className="text-stone-500">구분</div>
                         <div className="text-stone-500">일반 사주</div>
-                        <div className="text-slate-900 bg-yellow-100">평생 비책</div>
+                        <div className="text-slate-900 bg-yellow-100">프리미엄 비책</div>
                     </div>
                     {[
                         { label: "전문 용어 해설", free: "X", paid: "O" },
@@ -584,7 +584,7 @@ export default function WebtoonResult({ result, onReset }: WebtoonResultProps) {
                         <span className="font-black text-slate-900">{price.toLocaleString()}원</span>
                     </div>
                     <button className="flex-[3] bg-red-600 text-white border-b-4 border-r-4 border-red-800 active:border-0 active:translate-y-1 rounded-xl font-black text-xl shadow-xl flex items-center justify-center gap-2 transition-all">
-                        평생 비책 확인하기 <ChevronDown className="-rotate-90" size={20} />
+                        프리미엄 비책 확인하기 <ChevronDown className="-rotate-90" size={20} />
                     </button>
                 </div>
             </div>

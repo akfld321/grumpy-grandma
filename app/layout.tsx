@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 };
 
 import { GoogleTagManager } from '@next/third-parties/google';
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default function RootLayout({
   children,
@@ -35,6 +36,7 @@ export default function RootLayout({
         <div className="max-w-[600px] mx-auto min-h-screen bg-paper shadow-2xl relative flex flex-col">
 
           {children}
+          <SpeedInsights />
         </div>
       </body>
     </html>

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Lock, Sparkles, Heart, DollarSign, ArrowRight, ShieldCheck, Star, Users, TrendingUp, Activity, Calendar, Award } from 'lucide-react';
-import { loadTossPayments } from '@tosspayments/payment-sdk';
+import React, { useEffect, useRef, useState } from 'react';
+import { Lock, Sparkles, Heart, DollarSign, ArrowRight, ShieldCheck, Star, Users, TrendingUp, Activity, Calendar, Award, MessageCircle } from 'lucide-react';
+import { loadPaymentWidget, PaymentWidgetInstance } from '@tosspayments/payment-widget-sdk';
 import { sendGTMEvent } from '@/lib/gtm';
 
 interface SalesPageProps {
@@ -10,9 +10,13 @@ interface SalesPageProps {
 }
 
 export default function SalesPage({ onPaymentStart, userName, graphData }: SalesPageProps) {
-    const [timeLeft, setTimeLeft] = React.useState(1800); // 30 minutes
+    const [timeLeft, setTimeLeft] = useState(1800); // 30 minutes
+    const paymentWidgetRef = useRef<PaymentWidgetInstance | null>(null);
+    const paymentMethodsWidgetRef = useRef<any>(null);
+    const [price] = useState(29800);
+    const [isWidgetLoaded, setIsWidgetLoaded] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const timer = setInterval(() => {
             setTimeLeft(prev => prev > 0 ? prev - 1 : 0);
         }, 1000);
@@ -22,6 +26,39 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
 
         return () => clearInterval(timer);
     }, []);
+
+    // Load Payment Widget
+    useEffect(() => {
+        const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY;
+        const customerKey = "USER_" + Math.random().toString(36).substring(2, 12).toUpperCase(); // Anonymous user key
+
+        if (!clientKey) {
+            console.error("Toss Client Key is missing");
+            return;
+        }
+
+        (async () => {
+            try {
+                const paymentWidget = await loadPaymentWidget(clientKey, customerKey);
+
+                // Render Payment Methods
+                const paymentMethodsWidget = paymentWidget.renderPaymentMethods(
+                    '#payment-widget',
+                    { value: price },
+                    { variantKey: 'DEFAULT' } // Use default UI setting from admin console
+                );
+
+                // Render Agreement
+                paymentWidget.renderAgreement('#agreement', { variantKey: 'AGREEMENT' });
+
+                paymentWidgetRef.current = paymentWidget;
+                paymentMethodsWidgetRef.current = paymentMethodsWidget;
+                setIsWidgetLoaded(true);
+            } catch (error) {
+                console.error("Failed to load payment widget", error);
+            }
+        })();
+    }, [price]);
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60);
@@ -67,14 +104,20 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
 
     const handlePayment = async () => {
         try {
+            const paymentWidget = paymentWidgetRef.current;
+            if (!paymentWidget) {
+                alert('결제 모듈이 로딩되지 않았습니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
+
             // Analytics: Begin Checkout
             sendGTMEvent('initiate_checkout', {
                 currency: 'KRW',
-                value: 29800,
+                value: price,
                 items: [{
                     item_id: 'full_report_v1',
                     item_name: '욕쟁이 할머니 사주 프리미엄 리포트',
-                    price: 29800
+                    price: price
                 }]
             });
 
@@ -85,29 +128,27 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
                 return;
             }
 
-            // 2. Initialize Toss Payments
-            const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY;
-            if (!clientKey) {
-                alert('결제 연동 키가 설정되지 않았습니다.');
-                return;
-            }
-
-            const tossPayments = await loadTossPayments(clientKey);
-
-            // 3. Request Payment
-            await tossPayments.requestPayment('CARD', {
-                amount: 29800,
-                orderId: orderId, // Use ResultID as OrderID
+            // 2. Request Payment via Widget
+            await paymentWidget.requestPayment({
+                orderId: orderId,
                 orderName: '욕쟁이 할머니 사주 프리미엄 리포트',
                 customerName: userName,
+                customerEmail: 'customer@example.com', // Optional, can be collected if needed
                 successUrl: `${window.location.origin}/payment/success`,
                 failUrl: `${window.location.origin}/payment/fail`,
             });
 
-
         } catch (error) {
             console.error('Payment Error', error);
-            alert('결제 창을 띄우는 데 실패했습니다.');
+            // alert('결제 요청에 실패했습니다.'); // Widget handles internal errors mostly
+        }
+    };
+
+    // Scroll to widget function
+    const scrollToPayment = () => {
+        const element = document.getElementById('payment-section');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
         }
     };
 
@@ -263,7 +304,7 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
                     {chapters.map((chapter) => (
                         <div
                             key={chapter.id}
-                            onClick={handlePayment}
+                            onClick={scrollToPayment}
                             className={`
                                 flex-shrink-0 w-[85%] md:w-[320px] h-[520px] snap-center
                                 relative overflow-hidden rounded-3xl border bg-stone-900 cursor-pointer group transition-all duration-300
@@ -353,11 +394,6 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
                                     <Lock size={14} /> 확인하기
                                 </div>
                             </div>
-
-                            {/* Sample Badge */}
-                            <div className="absolute top-6 right-6 z-20">
-                                < Lock className="text-stone-500/50" />
-                            </div>
                         </div>
                     ))}
                 </div>
@@ -365,7 +401,7 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
 
             {/* Killer Hook: Repeater Chapter 8 (Standalone) */}
             <div className="w-full max-w-md px-4 mb-20">
-                <div className="relative overflow-hidden rounded-3xl border-2 border-pink-500 bg-stone-900 cursor-pointer group shadow-[0_0_50px_rgba(236,72,153,0.3)] transition-transform hover:scale-[1.02]" onClick={handlePayment}>
+                <div className="relative overflow-hidden rounded-3xl border-2 border-pink-500 bg-stone-900 cursor-pointer group shadow-[0_0_50px_rgba(236,72,153,0.3)] transition-transform hover:scale-[1.02]" onClick={scrollToPayment}>
 
                     {/* Header Tag */}
                     <div className="absolute top-0 w-full bg-pink-600 text-white text-center text-xs font-bold py-2 z-20 uppercase tracking-wider shadow-md">
@@ -423,6 +459,15 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
                 </div>
             </div>
 
+            {/* Payment Widget Section */}
+            <div id="payment-section" className="w-full max-w-lg mb-20 px-4 scroll-mt-20">
+                <h2 className="text-xl font-bold mb-4 text-center text-stone-100">결제 수단 선택</h2>
+                <div className="bg-white rounded-2xl p-4 shadow-2xl">
+                    <div id="payment-widget" className="w-full" />
+                    <div id="agreement" className="w-full mt-2" />
+                </div>
+            </div>
+
             {/* Pricing Action Floating / Bottom */}
             <div className="w-full max-w-lg sticky bottom-6 z-50 px-4">
                 <div className="bg-stone-900/95 backdrop-blur-xl border border-[#d4af37] rounded-2xl p-5 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] relative overflow-hidden ring-1 ring-[#d4af37]/50">
@@ -441,15 +486,26 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
 
                     <button
                         onClick={handlePayment}
-                        className="w-full py-4 bg-gradient-to-r from-[#d4af37] to-[#b5952f] hover:brightness-110 active:scale-95 text-stone-950 text-xl font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 group"
+                        disabled={!isWidgetLoaded}
+                        className={`w-full py-4 text-stone-950 text-xl font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 group
+                            ${isWidgetLoaded
+                                ? 'bg-gradient-to-r from-[#d4af37] to-[#b5952f] hover:brightness-110 active:scale-95'
+                                : 'bg-stone-600 cursor-not-allowed'}
+                        `}
                     >
-                        <Lock size={20} className="group-hover:hidden" />
-                        <span className="group-hover:hidden">결과 전체 잠금해제</span>
-                        <span className="hidden group-hover:inline-block">지금 내 운명 확인하기 👉</span>
+                        {!isWidgetLoaded ? (
+                            <span>결제 로딩 중...</span>
+                        ) : (
+                            <>
+                                <Lock size={20} className="group-hover:hidden" />
+                                <span className="group-hover:hidden">결과 전체 잠금해제</span>
+                                <span className="hidden group-hover:inline-block">지금 내 운명 확인하기 👉</span>
+                            </>
+                        )}
                     </button>
 
                     <p className="text-center text-[10px] text-stone-500 mt-3">
-                        * 한 번 결제로 평생 소장 | 100% 익명 보장
+                        * 결제 후 30일간 열람 가능 | 100% 익명 보장
                     </p>
                 </div>
             </div>
@@ -460,8 +516,14 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
                     <p className="font-bold text-stone-400 mb-1">주식회사 텐이어즈 (Ten Years Inc.)</p>
                     <p>대표자: 장세미 | 사업자등록번호: 397-86-03749</p>
                     <p>통신판매업신고: 준비중</p>
-                    <p>주소: (주소 업데이트 필요)</p>
-                    <p>고객센터: 010-5466-6240 | 이메일: ten_yearz@naver.com</p>
+                    <p>주소: 대구광역시 중구 동성로 25, 961호</p>
+                    <div className="flex items-center justify-center gap-2">
+                        <p>고객센터: 070-8824-6240 | 이메일: ten_yearz@naver.com</p>
+                        <a href="http://pf.kakao.com/_xeuGhX" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 bg-[#FAE100] text-[#3B1E1E] px-2 py-0.5 rounded font-bold hover:brightness-95 transition-all text-[10px]">
+                            <MessageCircle size={12} fill="currentColor" /> 할마카세 문의
+                        </a>
+                    </div>
+                    <p>서비스 이용 가능 기간: 구매일로부터 30일 (이후 데이터 삭제)</p>
                 </div>
 
                 <div className="flex items-center justify-center gap-4 text-[10px] text-stone-400 underline decoration-stone-600 underline-offset-2 mb-6">
@@ -473,7 +535,7 @@ export default function SalesPage({ onPaymentStart, userName, graphData }: Sales
                     <p className="item-center flex gap-1 mb-1 font-bold text-stone-500">
                         <ShieldCheck className="w-3 h-3" /> 구매 안전(에스크로) 서비스 가입 사실 확인
                     </p>
-                    * 디지털 콘텐츠 특성상 결제 후 '사주 풀이'가 데이터 생성이 시작되면 환불이 불가능합니다.<br />
+                    * 디지털 콘텐츠 특성상 결제 후 '사주 풀이'가 시작되면 환불이 불가능합니다.<br />
                     * 단, 시스템 오류로 분석이 실패한 경우 100% 환불해 드립니다.
                 </div>
             </div>

@@ -174,7 +174,7 @@ const Chapter8: React.FC<Chapter8Props> = ({ content, forceExpanded = false, res
             <div className="pt-12 px-6 text-center z-10 w-full mb-8">
                 <p className="text-xs font-bold tracking-[0.3em] text-pink-500 mb-2">CHAPTER 08</p>
                 <h2 className="text-3xl font-black mb-2 leading-tight">
-                    니 <span className="text-pink-400 drop-shadow-[0_0_15px_rgba(244,114,182,0.6)]">평생 짝꿍</span>은<br />
+                    니 <span className="text-pink-400 drop-shadow-[0_0_15px_rgba(244,114,182,0.6)]">운명의 짝꿍</span>은<br />
                     누굴까?
                 </h2>
                 <p className="text-stone-400 text-sm">
